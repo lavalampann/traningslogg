@@ -1,4 +1,4 @@
-// --- Globala variabler och referenser ---
+// --- Element ---
 const mainMenu = document.getElementById('mainMenu');
 const addExerciseSection = document.getElementById('addExerciseSection');
 const exercisesSection = document.getElementById('exercisesSection');
@@ -9,14 +9,11 @@ const exercisesBtn = document.getElementById('exercisesBtn');
 const statisticsBtn = document.getElementById('statisticsBtn');
 
 const saveExerciseBtn = document.getElementById('saveExerciseBtn');
-const backBtns = document.querySelectorAll('.backBtn');
-
 const newExerciseNameInput = document.getElementById('newExerciseName');
 
 const exerciseList = document.getElementById('exerciseList');
 const logSetSection = document.getElementById('logSetSection');
 const currentExerciseNameSpan = document.getElementById('currentExerciseName');
-
 const repsInput = document.getElementById('repsInput');
 const weightInput = document.getElementById('weightInput');
 const addSetBtn = document.getElementById('addSetBtn');
@@ -26,33 +23,37 @@ const setsList = document.getElementById('setsList');
 const statExerciseSelect = document.getElementById('statExerciseSelect');
 const statsContent = document.getElementById('statsContent');
 
-let exercises = []; // Array med {name: string, sets: [{reps, weight, date}]}
+const backBtns = document.querySelectorAll('.backBtn');
+
+let exercises = [];
 let currentExercise = null;
 
-// --- Funktioner för att visa/dölja sektioner ---
-function showSection(section) {
-  [mainMenu, addExerciseSection, exercisesSection, statisticsSection].forEach(s => {
-    s.classList.add('hidden');
-  });
-  section.classList.remove('hidden');
-}
-
-// --- Ladda och spara data i localStorage ---
+// --- Funktioner ---
 function saveExercises() {
   localStorage.setItem('exercises', JSON.stringify(exercises));
 }
 
 function loadExercises() {
-  const saved = localStorage.getItem('exercises');
-  if (saved) {
-    exercises = JSON.parse(saved);
+  const data = localStorage.getItem('exercises');
+  if (data) {
+    exercises = JSON.parse(data);
+  } else {
+    exercises = [];
   }
 }
 
-// --- Uppdatera listan med övningar i "Övningar" sektionen ---
+function showSection(section) {
+  // Dölj alla sektioner
+  [mainMenu, addExerciseSection, exercisesSection, statisticsSection].forEach(s => {
+    s.classList.add('hidden');
+  });
+  // Visa vald sektion
+  section.classList.remove('hidden');
+}
+
 function updateExerciseList() {
   exerciseList.innerHTML = '';
-  exercises.forEach((ex, index) => {
+  exercises.forEach(ex => {
     const li = document.createElement('li');
     li.textContent = ex.name;
     li.style.cursor = 'pointer';
@@ -63,161 +64,146 @@ function updateExerciseList() {
   });
 }
 
-// --- Öppna loggning av set för en övning ---
 function openLogSet(exercise) {
   currentExercise = exercise;
   currentExerciseNameSpan.textContent = exercise.name;
   repsInput.value = '';
   weightInput.value = '';
   setsList.innerHTML = '';
-
-  if (exercise.sets) {
-    exercise.sets.forEach(set => {
-      const li = document.createElement('li');
-      li.textContent = `${set.reps} reps @ ${set.weight} kg (${new Date(set.date).toLocaleDateString()})`;
-      setsList.appendChild(li);
-    });
+  if (!exercise.sets) {
+    exercise.sets = [];
   }
-
+  exercise.sets.forEach(set => {
+    const li = document.createElement('li');
+    li.textContent = `Reps: ${set.reps}, Vikt: ${set.weight} kg, Datum: ${new Date(set.date).toLocaleDateString()}`;
+    setsList.appendChild(li);
+  });
   logSetSection.classList.remove('hidden');
-  exerciseList.style.display = 'none';
+  showSection(exercisesSection);
 }
 
-// --- Lägg till set ---
-addSetBtn.addEventListener('click', () => {
+function addSet() {
   const reps = parseInt(repsInput.value);
   const weight = parseFloat(weightInput.value);
-
-  if (!reps || reps <= 0) {
-    alert('Ange ett giltigt antal reps');
+  if (isNaN(reps) || reps < 1) {
+    alert('Ange giltiga reps (minst 1).');
     return;
   }
   if (isNaN(weight) || weight < 0) {
-    alert('Ange en giltig vikt (0 eller högre)');
+    alert('Ange giltig vikt (0 eller mer).');
     return;
   }
-
   const set = {
     reps,
     weight,
     date: new Date().toISOString(),
   };
-
-  if (!currentExercise.sets) currentExercise.sets = [];
   currentExercise.sets.push(set);
   saveExercises();
+  openLogSet(currentExercise);
+}
 
-  const li = document.createElement('li');
-  li.textContent = `${set.reps} reps @ ${set.weight} kg (${new Date(set.date).toLocaleDateString()})`;
-  setsList.appendChild(li);
-
-  repsInput.value = '';
-  weightInput.value = '';
-});
-
-// --- Klar med att logga set ---
-doneLoggingBtn.addEventListener('click', () => {
-  logSetSection.classList.add('hidden');
-  exerciseList.style.display = 'block';
-});
-
-// --- Spara ny övning ---
-saveExerciseBtn.addEventListener('click', () => {
+function saveExercise() {
   const name = newExerciseNameInput.value.trim();
   if (!name) {
-    alert('Skriv in ett namn för övningen');
+    alert('Ange ett namn på övningen.');
     return;
   }
-
-  // Kolla om övning finns redan
-  if (exercises.find(e => e.name.toLowerCase() === name.toLowerCase())) {
-    alert('Den här övningen finns redan');
+  if (exercises.some(e => e.name.toLowerCase() === name.toLowerCase())) {
+    alert('Denna övning finns redan.');
     return;
   }
-
-  exercises.push({ name, sets: [] });
+  const newEx = { name, sets: [] };
+  exercises.push(newEx);
   saveExercises();
   newExerciseNameInput.value = '';
-  alert(`Övningen "${name}" sparad!`);
   updateExerciseList();
   updateStatSelect();
   showSection(mainMenu);
-});
+}
 
-// --- Uppdatera statistik-val dropdown ---
 function updateStatSelect() {
   statExerciseSelect.innerHTML = '<option value="">Välj övning</option>';
-  exercises.forEach((ex, i) => {
+  exercises.forEach(ex => {
     const opt = document.createElement('option');
-    opt.value = i;
+    opt.value = ex.name;
     opt.textContent = ex.name;
     statExerciseSelect.appendChild(opt);
   });
-  statsContent.innerHTML = '';
 }
 
-// --- Visa statistik för vald övning ---
-statExerciseSelect.addEventListener('change', () => {
-  const idx = statExerciseSelect.value;
-  if (idx === '') {
-    statsContent.innerHTML = '';
+function showStatistics() {
+  const selectedName = statExerciseSelect.value;
+  if (!selectedName) {
+    statsContent.innerHTML = '<p>Välj en övning för att se statistik.</p>';
     return;
   }
-  const ex = exercises[idx];
-  showStatsForExercise(ex);
-});
-
-// --- Visa grundläggande statistik ---
-function showStatsForExercise(exercise) {
-  if (!exercise.sets || exercise.sets.length === 0) {
-    statsContent.innerHTML = '<p>Inga sets loggade för den här övningen än.</p>';
+  const exercise = exercises.find(e => e.name === selectedName);
+  if (!exercise || !exercise.sets || exercise.sets.length === 0) {
+    statsContent.innerHTML = '<p>Ingen data för denna övning än.</p>';
     return;
   }
 
-  // Statistik: antal träningspass (unika datum), maxvikt, genomsnitt reps och vikt
-  const uniqueDates = new Set(exercise.sets.map(s => s.date.substring(0, 10)));
-  const maxWeight = Math.max(...exercise.sets.map(s => s.weight));
-  const avgReps =
-    exercise.sets.reduce((acc, s) => acc + s.reps, 0) / exercise.sets.length;
-  const avgWeight =
-    exercise.sets.reduce((acc, s) => acc + s.weight, 0) / exercise.sets.length;
+  // Exempel på statistik: antal pass per vecka + max vikt och reps
+  const sets = exercise.sets;
 
-  statsContent.innerHTML = `
-    <p>Antal träningspass: ${uniqueDates.size}</p>
-    <p>Maxvikt: ${maxWeight.toFixed(1)} kg</p>
-    <p>Genomsnittliga reps: ${avgReps.toFixed(1)}</p>
-    <p>Genomsnittlig vikt: ${avgWeight.toFixed(1)} kg</p>
-  `;
-}
-
-// --- Backknappar ---
-backBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    // Göm allt och visa main menu
-    logSetSection.classList.add('hidden');
-    exerciseList.style.display = 'block';
-    showSection(mainMenu);
+  // Räkna pass per vecka
+  const weeks = {};
+  sets.forEach(set => {
+    const d = new Date(set.date);
+    const year = d.getFullYear();
+    const week = getWeekNumber(d);
+    const key = year + '-W' + week;
+    weeks[key] = (weeks[key] || 0) + 1;
   });
-});
 
-// --- Knapp för att gå till "Lägg till övning" ---
-addExerciseBtn.addEventListener('click', () => {
-  newExerciseNameInput.value = '';
-  showSection(addExerciseSection);
-});
+  let statsHtml = '<h3>Pass per vecka</h3><ul>';
+  for (const wk in weeks) {
+    statsHtml += `<li>${wk}: ${weeks[wk]} set</li>`;
+  }
+  statsHtml += '</ul>';
 
-// --- Knapp för att gå till "Övningar" ---
+  // Max vikt och reps
+  const maxWeight = Math.max(...sets.map(s => s.weight));
+  const maxReps = Math.max(...sets.map(s => s.reps));
+
+  statsHtml += `<p>Max vikt: ${maxWeight} kg</p>`;
+  statsHtml += `<p>Max reps: ${maxReps}</p>`;
+
+  statsContent.innerHTML = statsHtml;
+}
+
+function getWeekNumber(d) {
+  // Källa: https://stackoverflow.com/a/6117889
+  d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+// --- Eventlisteners ---
+addExerciseBtn.addEventListener('click', () => showSection(addExerciseSection));
 exercisesBtn.addEventListener('click', () => {
   updateExerciseList();
-  logSetSection.classList.add('hidden');
-  exerciseList.style.display = 'block';
   showSection(exercisesSection);
 });
-
-// --- Knapp för att gå till "Statistik" ---
 statisticsBtn.addEventListener('click', () => {
   updateStatSelect();
   showSection(statisticsSection);
+});
+
+saveExerciseBtn.addEventListener('click', saveExercise);
+addSetBtn.addEventListener('click', addSet);
+doneLoggingBtn.addEventListener('click', () => {
+  logSetSection.classList.add('hidden');
+});
+
+backBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    logSetSection.classList.add('hidden');
+    showSection(mainMenu);
+  });
 });
 
 // --- Init ---
