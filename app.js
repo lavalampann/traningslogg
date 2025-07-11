@@ -21,6 +21,15 @@ const setsList = document.getElementById("setsList");
 const statsExerciseSelect = document.getElementById("statsExerciseSelect");
 const statsOutput = document.getElementById("statsOutput");
 
+const addExerciseBtn = document.getElementById('addExerciseBtn');
+const addExerciseSection = document.getElementById('addExerciseSection');
+const mainMenu = document.getElementById('mainMenu');
+
+addExerciseBtn.addEventListener('click', () => {
+  mainMenu.style.display = 'none';
+  addExerciseSection.style.display = 'block';
+});
+
 let exercises = JSON.parse(localStorage.getItem("exercises")) || [];
 let currentExercise = null;
 
