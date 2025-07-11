@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Träningslogg</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Träningslogg</h1>
+
+  <!-- Startmeny -->
+  <div id="mainMenu">
+    <button id="addExerciseBtn">Lägg till övning</button>
+    <button id="exercisesBtn">Övningar</button>
+    <button id="statisticsBtn">Statistik</button>
+  </div>
+
+  <!-- Lägg till övning -->
+  <div id="addExerciseSection" class="hidden">
+    <h2>Skapa ny övning</h2>
+    <input type="text" id="newExerciseName" placeholder="Övningsnamn" />
+    <button id="saveExerciseBtn">Spara övning</button>
+    <button class="backBtn">Tillbaka</button>
+  </div>
+
+  <!-- Övningar (lista och logg) -->
+  <div id="exercisesSection" class="hidden">
+    <h2>Övningar</h2>
+    <ul id="exerciseList"></ul>
+
+    <div id="logSetSection" class="hidden">
+      <h3>Logga set för <span id="currentExerciseName"></span></h3>
+      <input type="number" id="repsInput" placeholder="Reps" min="1" />
+      <input type="number" id="weightInput" placeholder="Vikt (kg)" min="0" step="0.1" />
+      <button id="addSetBtn">Lägg till set</button>
+      <button id="doneLoggingBtn">Klart</button>
+
+      <h4>Sets</h4>
+      <ul id="setsList"></ul>
+    </div>
+
+    <button class="backBtn">Tillbaka</button>
+  </div>
+
+  <!-- Statistik -->
+  <div id="statisticsSection" class="hidden">
+    <h2>Statistik</h2>
+    <select id="statExerciseSelect">
+      <option value="">Välj övning</option>
+    </select>
+    <div id="statsContent">
+      <!-- Statistik kommer visas här -->
+    </div>
+    <button class="backBtn">Tillbaka</button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
