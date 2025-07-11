@@ -44,15 +44,24 @@
   <!-- Statistik -->
   <div id="statisticsSection" class="hidden">
     <h2>Statistik</h2>
+    <label for="statExerciseSelect">Välj övning:</label>
     <select id="statExerciseSelect">
       <option value="">Välj övning</option>
     </select>
+
+    <label for="statSetSelect">Välj pass (set):</label>
+    <select id="statSetSelect" class="hidden">
+      <option value="">Välj pass</option>
+    </select>
+
     <div id="statsContent">
-      <!-- Statistik kommer visas här -->
+      <!-- Statistik och graf kommer visas här -->
     </div>
+
     <button class="backBtn">Tillbaka</button>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
