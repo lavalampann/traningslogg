@@ -170,4 +170,56 @@ statExerciseSelect.addEventListener('change', () => {
 // --- Visa grundläggande statistik ---
 function showStatsForExercise(exercise) {
   if (!exercise.sets || exercise.sets.length === 0) {
-    statsContent.innerHTML = '<p>Inga sets loggade
+    statsContent.innerHTML = '<p>Inga sets loggade för den här övningen än.</p>';
+    return;
+  }
+
+  // Statistik: antal träningspass (unika datum), maxvikt, genomsnitt reps och vikt
+  const uniqueDates = new Set(exercise.sets.map(s => s.date.substring(0, 10)));
+  const maxWeight = Math.max(...exercise.sets.map(s => s.weight));
+  const avgReps =
+    exercise.sets.reduce((acc, s) => acc + s.reps, 0) / exercise.sets.length;
+  const avgWeight =
+    exercise.sets.reduce((acc, s) => acc + s.weight, 0) / exercise.sets.length;
+
+  statsContent.innerHTML = `
+    <p>Antal träningspass: ${uniqueDates.size}</p>
+    <p>Maxvikt: ${maxWeight.toFixed(1)} kg</p>
+    <p>Genomsnittliga reps: ${avgReps.toFixed(1)}</p>
+    <p>Genomsnittlig vikt: ${avgWeight.toFixed(1)} kg</p>
+  `;
+}
+
+// --- Backknappar ---
+backBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Göm allt och visa main menu
+    logSetSection.classList.add('hidden');
+    exerciseList.style.display = 'block';
+    showSection(mainMenu);
+  });
+});
+
+// --- Knapp för att gå till "Lägg till övning" ---
+addExerciseBtn.addEventListener('click', () => {
+  newExerciseNameInput.value = '';
+  showSection(addExerciseSection);
+});
+
+// --- Knapp för att gå till "Övningar" ---
+exercisesBtn.addEventListener('click', () => {
+  updateExerciseList();
+  logSetSection.classList.add('hidden');
+  exerciseList.style.display = 'block';
+  showSection(exercisesSection);
+});
+
+// --- Knapp för att gå till "Statistik" ---
+statisticsBtn.addEventListener('click', () => {
+  updateStatSelect();
+  showSection(statisticsSection);
+});
+
+// --- Init ---
+loadExercises();
+showSection(mainMenu);
