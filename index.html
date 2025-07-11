@@ -1,20 +1,22 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Träningslogg</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <h1>Träningslogg</h1>
 
-  <div id="mainMenu" class="main-menu">
-    <button id="addExerciseBtn" class="menu-button add-exercise">Lägg till övning</button>
-    <button id="exercisesBtn" class="menu-button exercises">Övningar</button>
-    <button id="statisticsBtn" class="menu-button statistics">Statistik</button>
+  <!-- Startmeny -->
+  <div id="mainMenu">
+    <button id="addExerciseBtn">Lägg till övning</button>
+    <button id="exercisesBtn">Övningar</button>
+    <button id="statisticsBtn">Statistik</button>
   </div>
 
+  <!-- Lägg till övning -->
   <div id="addExerciseSection" class="hidden">
     <h2>Skapa ny övning</h2>
     <input type="text" id="newExerciseName" placeholder="Övningsnamn" />
@@ -22,6 +24,7 @@
     <button class="backBtn">Tillbaka</button>
   </div>
 
+  <!-- Övningar (lista och logg) -->
   <div id="exercisesSection" class="hidden">
     <h2>Övningar</h2>
     <ul id="exerciseList"></ul>
@@ -40,25 +43,18 @@
     <button class="backBtn">Tillbaka</button>
   </div>
 
+  <!-- Statistik -->
   <div id="statisticsSection" class="hidden">
     <h2>Statistik</h2>
-    <label for="statExerciseSelect">Välj övning:</label>
     <select id="statExerciseSelect">
       <option value="">Välj övning</option>
     </select>
-
-    <label for="statSetSelect" class="hidden" id="labelSetSelect">Välj pass (set):</label>
-    <select id="statSetSelect" class="hidden">
-      <option value="">Välj pass</option>
-    </select>
-
-    <canvas id="chart" style="max-width: 100%; margin-top: 1rem;"></canvas>
-
-    <div id="statsContent"></div>
+    <div id="statsContent">
+      <!-- Statistik kommer visas här -->
+    </div>
     <button class="backBtn">Tillbaka</button>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
