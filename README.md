@@ -1,1 +1,1 @@
-# traningslogg
+# träningslogg
